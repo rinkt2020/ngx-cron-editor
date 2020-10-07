@@ -38,6 +38,7 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
   // @Output() cronChange = new EventEmitter();
 
   public activeTab: string;
+  public activeTabIndex: number;
   public selectOptions = this.getSelectOptions();
   public state: any;
 
@@ -118,97 +119,97 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
 
     const [defaultHours, defaultMinutes, defaultSeconds] = this.options.defaultTime.split(':').map(Number);
 
-    this.cronForm = new FormControl('0 0 1/1 * *');
+    this.cronForm = new FormControl(this.cron || '0 0 1/1 * *');
 
     this.minutesForm = this.fb.group({
       hours: [0],
-      minutes: [1],
-      seconds: [0]
+      minutes: [(this.state.minutes && this.state.minutes.minutes) || 1],
+      seconds: [(this.state.minutes && this.state.minutes.seconds) || 0]
     });
 
     this.minutesForm.valueChanges.subscribe(value => this.computeMinutesCron(value));
 
     this.hourlyForm = this.fb.group({
-      hours: [1],
-      minutes: [0],
-      seconds: [0]
+      hours: [(this.state.hourly && this.state.hourly.hours) || 1],
+      minutes: [(this.state.hourly && this.state.hourly.minutes) || 0],
+      seconds: [(this.state.hourly && this.state.hourly.seconds) || 0]
     });
     this.hourlyForm.valueChanges.subscribe(value => this.computeHourlyCron(value));
 
     this.dailyForm = this.fb.group({
-      subTab: ['everyDays'],
+      subTab: [(this.state.daily && this.state.daily.subTab) || 'everyDays'],
       everyDays: this.fb.group({
-        days: [1],
-        hours: [this.getAmPmHour(1)],
-        minutes: [0],
-        seconds: [0],
-        hourType: [this.getHourType(0)]
+        days: [(this.state.daily && this.state.daily.everyDays && this.state.daily.everyDays.days) || 1],
+        hours: [(this.state.daily && this.state.daily.everyDays && this.state.daily.everyDays.hours) || this.getAmPmHour(1)],
+        minutes: [(this.state.daily && this.state.daily.everyDays && this.state.daily.everyDays.minutes) || 0],
+        seconds: [(this.state.daily && this.state.daily.everyDays && this.state.daily.everyDays.seconds) || 0],
+        hourType: [(this.state.daily && this.state.daily.everyDays && this.state.daily.everyDays.hourType) || this.getHourType(0)]
       }),
       everyWeekDay: this.fb.group({
-        days: [0],
-        hours: [this.getAmPmHour(1)],
-        minutes: [0],
-        seconds: [0],
-        hourType: [this.getHourType(0)]
+        hours: [(this.state.daily && this.state.daily.everyWeekDay && this.state.daily.everyWeekDay.hours) || this.getAmPmHour(1)],
+        minutes: [(this.state.daily && this.state.daily.everyWeekDay && this.state.daily.everyWeekDay.minutes) || 0],
+        seconds: [(this.state.daily && this.state.daily.everyWeekDay && this.state.daily.everyWeekDay.seconds) || 0],
+        hourType: [(this.state.daily && this.state.daily.everyWeekDay && this.state.daily.everyWeekDay.hourType) || this.getHourType(0)]
       })
     });
     this.dailyForm.valueChanges.subscribe(value => this.computeDailyCron(value));
 
     this.weeklyForm = this.fb.group({
-      MON: [true],
-      TUE: [false],
-      WED: [false],
-      THU: [false],
-      FRI: [false],
-      SAT: [false],
-      SUN: [false],
-      hours: [this.getAmPmHour(defaultHours)],
-      minutes: [defaultMinutes],
-      seconds: [defaultSeconds],
-      hourType: [this.getHourType(defaultHours)]
+      MON: [(this.state.weekly && this.state.weekly['MON']) || true],
+      TUE: [(this.state.weekly && this.state.weekly['TUE']) || false],
+      WED: [(this.state.weekly && this.state.weekly['WED']) || false],
+      THU: [(this.state.weekly && this.state.weekly['THU']) || false],
+      FRI: [(this.state.weekly && this.state.weekly['FRI']) || false],
+      SAT: [(this.state.weekly && this.state.weekly['SAT']) || false],
+      SUN: [(this.state.weekly && this.state.weekly['SUN']) || false],
+      hours: [(this.state.weekly && this.state.weekly.hours) || this.getAmPmHour(defaultHours)],
+      minutes: [(this.state.weekly && this.state.weekly.minutes) || defaultMinutes],
+      seconds: [(this.state.weekly && this.state.weekly.seconds) || defaultSeconds],
+      hourType: [(this.state.weekly && this.state.weekly.hourType) || this.getHourType(defaultHours)]
     });
     this.weeklyForm.valueChanges.subscribe(next => this.computeWeeklyCron(next));
 
+    const monthWeek = (this.state.monthly && this.state.monthly.specificWeekDay && this.state.monthly.specificWeekDay.monthWeek);
     this.monthlyForm = this.fb.group({
-      subTab: ['specificDay'],
+      subTab: [(this.state.monthly && this.state.monthly.subTab) || 'specificDay'],
       specificDay: this.fb.group({
-        day: ['1'],
-        months: [1],
-        hours: [this.getAmPmHour(defaultHours)],
-        minutes: [defaultMinutes],
-        seconds: [defaultSeconds],
-        hourType: [this.getHourType(defaultHours)]
+        day: [(this.state.monthly && this.state.monthly.specificDay && this.state.monthly.specificDay.day) || '1'],
+        months: [(this.state.monthly && this.state.monthly.specificDay && this.state.monthly.specificDay.months) || 1],
+        hours: [(this.state.monthly && this.state.monthly.specificDay && this.state.monthly.specificDay.hours) || this.getAmPmHour(defaultHours)],
+        minutes: [(this.state.monthly && this.state.monthly.specificDay && this.state.monthly.specificDay.minutes) || defaultMinutes],
+        seconds: [(this.state.monthly && this.state.monthly.specificDay && this.state.monthly.specificDay.seconds) || defaultSeconds],
+        hourType: [(this.state.monthly && this.state.monthly.specificDay && this.state.monthly.specificDay.hourType) || this.getHourType(defaultHours)]
       }),
       specificWeekDay: this.fb.group({
-        monthWeek: ['#1'],
-        day: ['MON'],
-        months: [1],
-        hours: [this.getAmPmHour(defaultHours)],
-        minutes: [defaultMinutes],
-        seconds: [defaultSeconds],
-        hourType: [this.getHourType(defaultHours)]
+        monthWeek: [monthWeek || '#1'],
+        day: [(this.state.monthly && this.state.monthly.specificWeekDay && this.state.monthly.specificWeekDay.day) || 'MON'],
+        months: [(this.state.monthly && this.state.monthly.specificWeekDay && this.state.monthly.specificWeekDay.months) || 1],
+        hours: [(this.state.monthly && this.state.monthly.specificWeekDay && this.state.monthly.specificWeekDay.hours) || this.getAmPmHour(defaultHours)],
+        minutes: [(this.state.monthly && this.state.monthly.specificWeekDay && this.state.monthly.specificWeekDay.minutes) || defaultMinutes],
+        seconds: [(this.state.monthly && this.state.monthly.specificWeekDay && this.state.monthly.specificWeekDay.seconds) || defaultSeconds],
+        hourType: [(this.state.monthly && this.state.monthly.specificWeekDay && this.state.monthly.specificWeekDay.hourType) || this.getHourType(defaultHours)]
       })
     });
     this.monthlyForm.valueChanges.subscribe(next => this.computeMonthlyCron(next));
 
     this.yearlyForm = this.fb.group({
-      subTab: ['specificMonthDay'],
+      subTab: [(this.state.yearly && this.state.yearly.subTab) || 'specificMonthDay'],
       specificMonthDay: this.fb.group({
-        month: [1],
-        day: ['1'],
-        hours: [this.getAmPmHour(defaultHours)],
-        minutes: [defaultMinutes],
-        seconds: [defaultSeconds],
-        hourType: [this.getHourType(defaultHours)]
+        month: [(this.state.yearly && this.state.yearly.specificMonthDay && this.state.yearly.specificMonthDay.month) || 1],
+        day: [(this.state.yearly && this.state.yearly.specificMonthDay && this.state.yearly.specificMonthDay.day) || '1'],
+        hours: [(this.state.yearly && this.state.yearly.specificMonthDay && this.state.yearly.specificMonthDay.hours) || this.getAmPmHour(defaultHours)],
+        minutes: [(this.state.yearly && this.state.yearly.specificMonthDay && this.state.yearly.specificMonthDay.minutes) || defaultMinutes],
+        seconds: [(this.state.yearly && this.state.yearly.specificMonthDay && this.state.yearly.specificMonthDay.seconds) || defaultSeconds],
+        hourType: [(this.state.yearly && this.state.yearly.specificMonthDay && this.state.yearly.specificMonthDay.hourType) || this.getHourType(defaultHours)]
       }),
       specificMonthWeek: this.fb.group({
-        monthWeek: ['#1'],
-        day: ['MON'],
-        month: [1],
-        hours: [this.getAmPmHour(defaultHours)],
-        minutes: [defaultMinutes],
-        seconds: [defaultSeconds],
-        hourType: [this.getHourType(defaultHours)]
+        monthWeek: [(this.state.yearly && this.state.yearly.specificMonthWeek && this.state.yearly.specificMonthWeek.monthWeek) || '#1'],
+        day: [(this.state.yearly && this.state.yearly.specificMonthWeek && this.state.yearly.specificMonthWeek.day) || 'MON'],
+        month: [(this.state.yearly && this.state.yearly.specificMonthWeek && this.state.yearly.specificMonthWeek.month) || 1],
+        hours: [(this.state.yearly && this.state.yearly.specificMonthWeek && this.state.yearly.specificMonthWeek.hours) || this.getAmPmHour(defaultHours)],
+        minutes: [(this.state.yearly && this.state.yearly.specificMonthWeek && this.state.yearly.specificMonthWeek.minutes) || defaultMinutes],
+        seconds: [(this.state.yearly && this.state.yearly.specificMonthWeek && this.state.yearly.specificMonthWeek.seconds) || defaultSeconds],
+        hourType: [(this.state.yearly && this.state.yearly.specificMonthWeek && this.state.yearly.specificMonthWeek.hourType) || this.getHourType(defaultHours)]
       })
     });
     this.yearlyForm.valueChanges.subscribe(next => this.computeYearlyCron(next));
@@ -351,17 +352,20 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
 
     if (cron.match(/\d+ 0\/\d+ \* 1\/1 \* [\?\*] \*/)) {
       this.activeTab = 'minutes';
+      this.activeTabIndex = 0;
 
       this.state.minutes.minutes = parseInt(minutes.substring(2), 10);
       this.state.minutes.seconds = parseInt(seconds, 10);
     } else if (cron.match(/\d+ \d+ 0\/\d+ 1\/1 \* [\?\*] \*/)) {
       this.activeTab = 'hourly';
+      this.activeTabIndex = 1;
 
       this.state.hourly.hours = parseInt(hours.substring(2), 10);
       this.state.hourly.minutes = parseInt(minutes, 10);
       this.state.hourly.seconds = parseInt(seconds, 10);
     } else if (cron.match(/\d+ \d+ \d+ 1\/\d+ \* [\?\*] \*/)) {
       this.activeTab = 'daily';
+      this.activeTabIndex = 2;
 
       this.state.daily.subTab = 'everyDays';
       this.state.daily.everyDays.days = parseInt(dayOfMonth.substring(2), 10);
@@ -372,6 +376,7 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       this.state.daily.everyDays.seconds = parseInt(seconds, 10);
     } else if (cron.match(/\d+ \d+ \d+ [\?\*] \* MON-FRI \*/)) {
       this.activeTab = 'daily';
+      this.activeTabIndex = 2;
 
       this.state.daily.subTab = 'everyWeekDay';
       const parsedHours = parseInt(hours, 10);
@@ -381,6 +386,8 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       this.state.daily.everyWeekDay.seconds = parseInt(seconds, 10);
     } else if (cron.match(/\d+ \d+ \d+ [\?\*] \* (MON|TUE|WED|THU|FRI|SAT|SUN)(,(MON|TUE|WED|THU|FRI|SAT|SUN))* \*/)) {
       this.activeTab = 'weekly';
+      this.activeTabIndex = 3;
+
       this.selectOptions.days.forEach(weekDay => this.state.weekly[weekDay] = false);
       dayOfWeek.split(',').forEach(weekDay => this.state.weekly[weekDay] = true);
       const parsedHours = parseInt(hours, 10);
@@ -390,6 +397,8 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       this.state.weekly.seconds = parseInt(seconds, 10);
     } else if (cron.match(/\d+ \d+ \d+ (\d+|L|LW|1W) 1\/\d+ [\?\*] \*/)) {
       this.activeTab = 'monthly';
+      this.activeTabIndex = 4;
+
       this.state.monthly.subTab = 'specificDay';
       this.state.monthly.specificDay.day = dayOfMonth;
       this.state.monthly.specificDay.months = parseInt(month.substring(2), 10);
@@ -402,6 +411,8 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       const day = dayOfWeek.substr(0, 3);
       const monthWeek = dayOfWeek.substr(3);
       this.activeTab = 'monthly';
+      this.activeTabIndex = 4;
+
       this.state.monthly.subTab = 'specificWeekDay';
       this.state.monthly.specificWeekDay.monthWeek = monthWeek;
       this.state.monthly.specificWeekDay.day = day;
@@ -413,6 +424,8 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       this.state.monthly.specificWeekDay.seconds = parseInt(seconds, 10);
     } else if (cron.match(/\d+ \d+ \d+ (\d+|L|LW|1W) \d+ [\?\*] \*/)) {
       this.activeTab = 'yearly';
+      this.activeTabIndex = 5;
+
       this.state.yearly.subTab = 'specificMonthDay';
       this.state.yearly.specificMonthDay.month = parseInt(month, 10);
       this.state.yearly.specificMonthDay.day = dayOfMonth;
@@ -425,6 +438,8 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       const day = dayOfWeek.substr(0, 3);
       const monthWeek = dayOfWeek.substr(3);
       this.activeTab = 'yearly';
+      this.activeTabIndex = 5;
+
       this.state.yearly.subTab = 'specificMonthWeek';
       this.state.yearly.specificMonthWeek.monthWeek = monthWeek;
       this.state.yearly.specificMonthWeek.day = day;
@@ -436,6 +451,8 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       this.state.yearly.specificMonthWeek.seconds = parseInt(seconds, 10);
     } else {
       this.activeTab = 'advanced';
+      this.activeTabIndex = 6;
+
       this.state.advanced.expression = origCron;
     }
   }

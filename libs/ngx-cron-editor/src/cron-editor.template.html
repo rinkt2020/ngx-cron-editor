@@ -1,5 +1,6 @@
 <section class="cron-editor-main">
-    <mat-tab-group class="cron-editor-container" (selectedIndexChange)="onTabFocus($event)" [backgroundColor]="backgroundColor" [color]="color">
+    <mat-tab-group class="cron-editor-container" (selectedIndexChange)="onTabFocus($event)"
+                   [backgroundColor]="backgroundColor" [color]="color" [selectedIndex]="activeTabIndex">
 
       <!-- Minute -->
       <mat-tab class="cron-editor-tab" label="Minutes" *ngIf="!options.hideMinutesTab">
@@ -34,7 +35,7 @@
         <div class="cron-editor-tab-content" [formGroup]="dailyForm">
 
           <mat-radio-group class="cron-editor-radio-group" formControlName="subTab">
-            <mat-radio-button name="subTab" class="cron-editor-radio-button" value="everyDays" checked="checked">
+            <mat-radio-button name="subTab" class="cron-editor-radio-button" value="everyDays">
 
               <span class="cron-form-label">Every </span>
 
@@ -118,9 +119,9 @@
                   <mat-form-field>
                     <mat-label>Day</mat-label>
                     <mat-select class="month-days" formControlName="day">
-                      <option *ngFor="let monthDaysWithLast of selectOptions.monthDaysWithLasts" [value]="monthDaysWithLast">
+                      <mat-option *ngFor="let monthDaysWithLast of selectOptions.monthDaysWithLasts" [value]="monthDaysWithLast">
                         {{monthDayDisplay(monthDaysWithLast)}}
-                      </option>
+                      </mat-option>
                     </mat-select>
                   </mat-form-field>
                 </ng-container>
