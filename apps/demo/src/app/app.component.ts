@@ -9,7 +9,7 @@ import {FormBuilder, FormControl, FormGroup} from '@angular/forms';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  public cronExpression = '7 6 2 ? 5 FRI#4 *';
+  public cronExpression = '0 15 10 L-2 * ? *';
   public isCronDisabled = false;
   public cronOptions: CronOptions = {
     formInputClass: 'form-control cron-editor-input',
@@ -26,6 +26,7 @@ export class AppComponent implements OnInit {
     hideMonthlyTab: false,
     hideYearlyTab: false,
     hideAdvancedTab: false,
+    hideOneTimeTab: false,
     hideSpecificWeekDayTab: false,
     hideSpecificMonthWeekTab: false,
 

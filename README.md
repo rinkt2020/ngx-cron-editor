@@ -70,6 +70,7 @@ export class MyComponent {
        hideMonthlyTab: false,
        hideYearlyTab: false,
        hideAdvancedTab: true,
+       hideOneTimeTab: true,
        hideSpecificWeekDayTab : false,
        hideSpecificMonthWeekTab : false,
 

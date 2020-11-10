@@ -11,6 +11,13 @@ export const CRON_VALUE_ACCESSOR: any = {
   multi: true,
 };
 
+function padLeft(value: string, pad: string = '00'): string {
+  return `${pad.substr(0, pad.length > value.length ? pad.length - value.length : 0)}${value}`;
+}
+
+function padLeftN(value: number, pad: string = '00'): string {
+  return padLeft(`${value}`, pad);
+}
 
 @Component({
   selector: 'cron-editor',
@@ -54,7 +61,16 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
   monthlyForm: FormGroup;
   yearlyForm: FormGroup;
   advancedForm: FormGroup;
+  oneTimeForm: FormGroup;
 
+  private static getCronFromDate(date: Date): string {
+    return `${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth() + 1} ? ${date.getFullYear()}`;
+  }
+
+  private static getFormatCurrentDate(): string {
+    const date = new Date();
+    return `${date.getFullYear()}-${padLeftN(date.getMonth() + 1)}-${padLeftN(date.getDate())}T${padLeftN(date.getHours())}:${padLeftN(date.getMinutes())}`;
+  }
 
   get isCronFlavorQuartz() {
     return this.options.cronFlavor === 'quartz';
@@ -105,6 +121,9 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
         this.yearlyForm.setValue(this.yearlyForm.value);
         break;
       case 6:
+        this.oneTimeForm.setValue(this.oneTimeForm.value);
+        break;
+      case 7:
         this.advancedForm.setValue(this.advancedForm.value);
         break;
       default:
@@ -215,9 +234,14 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
     this.yearlyForm.valueChanges.subscribe(next => this.computeYearlyCron(next));
 
     this.advancedForm = this.fb.group({
-      expression: [this.isCronFlavorQuartz ? '0 15 10 L-2 * ? *' : '15 10 2 * *']
+      expression: [this.state.advanced.expression]
     });
     this.advancedForm.controls.expression.valueChanges.subscribe(next => this.computeAdvancedExpression(next));
+
+    this.oneTimeForm = this.fb.group({
+      valueDateTime: [this.state.oneTime.valueDateTime]
+    });
+    this.oneTimeForm.controls.valueDateTime.valueChanges.subscribe(next => this.computeOneTimeExpression(next));
   }
 
   private computeMinutesCron(state: any) {
@@ -285,6 +309,11 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
     this.cronForm.setValue(this.cron);
   }
 
+  private computeOneTimeExpression(expression: string) {
+    this.cron = CronGenComponent.getCronFromDate(new Date(expression));
+    this.cronForm.setValue(this.cron);
+  }
+
   public dayDisplay(day: string): string {
     return Days[day];
   }
@@ -348,7 +377,7 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       cron = `0 ${cron} *`;
     }
 
-    const [seconds, minutes, hours, dayOfMonth, month, dayOfWeek] = cron.split(' ');
+    const [seconds, minutes, hours, dayOfMonth, month, dayOfWeek, year] = cron.split(' ');
 
     if (cron.match(/\d+ 0\/\d+ \* 1\/1 \* [\?\*] \*/)) {
       this.activeTab = 'minutes';
@@ -449,9 +478,14 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
       this.state.yearly.specificMonthWeek.hourType = this.getHourType(parsedHours);
       this.state.yearly.specificMonthWeek.minutes = parseInt(minutes, 10);
       this.state.yearly.specificMonthWeek.seconds = parseInt(seconds, 10);
+    } else  if (cron.match(/\d+ \d+ \d+ \d+ \d+ \? \d+/)) {
+      this.activeTab = 'once';
+      this.activeTabIndex = 6;
+
+      this.state.oneTime.valueDateTime = `${year}-${padLeft(month)}-${padLeft(dayOfMonth)}T${padLeft(hours)}:${padLeft(minutes)}:${padLeft(seconds)}`;
     } else {
       this.activeTab = 'advanced';
-      this.activeTabIndex = 6;
+      this.activeTabIndex = 7;
 
       this.state.advanced.expression = origCron;
     }
@@ -550,6 +584,9 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
           seconds: defaultSeconds,
           hourType: this.getHourType(defaultHours)
         }
+      },
+      oneTime: {
+        valueDateTime: CronGenComponent.getFormatCurrentDate(),
       },
       advanced: {
         expression: this.isCronFlavorQuartz ? '0 15 10 L-2 * ? *' : '15 10 2 * *'
