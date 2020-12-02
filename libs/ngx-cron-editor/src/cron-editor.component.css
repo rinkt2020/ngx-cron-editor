@@ -80,3 +80,8 @@
 .checkbox-margin {
   margin: 0 10px;
 }
+
+.fieldSetBorder{
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
+}
