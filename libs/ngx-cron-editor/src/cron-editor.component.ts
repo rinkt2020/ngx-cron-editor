@@ -1,8 +1,21 @@
-import {Component, Input, Output, OnInit, OnChanges, SimpleChanges, EventEmitter, forwardRef} from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  EventEmitter,
+  forwardRef,
+  ViewChild,
+  ElementRef,
+  AfterViewInit
+} from '@angular/core';
 import {CronOptions} from './CronOptions';
 import {Days, MonthWeeks, Months} from './enums';
 import {ControlContainer, ControlValueAccessor, FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {ThemePalette} from '@angular/material/core';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
 
 
 export const CRON_VALUE_ACCESSOR: any = {
@@ -25,7 +38,7 @@ function padLeftN(value: number, pad: string = '00'): string {
   styleUrls: ['./cron-editor.component.css'],
   providers: [CRON_VALUE_ACCESSOR]
 })
-export class CronGenComponent implements OnInit, ControlValueAccessor {
+export class CronGenComponent implements OnInit, ControlValueAccessor, AfterViewInit {
 
   @Input() public backgroundColor: ThemePalette;
   @Input() public color: ThemePalette;
@@ -63,6 +76,8 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
   advancedForm: FormGroup;
   oneTimeForm: FormGroup;
 
+  @ViewChild('matSectionGroup', {static: false}) matSectionGroup;
+
   private static getCronFromDate(date: Date): string {
     return `${date.getSeconds()} ${date.getMinutes()} ${date.getHours()} ${date.getDate()} ${date.getMonth() + 1} ? ${date.getFullYear()}`;
   }
@@ -94,6 +109,28 @@ export class CronGenComponent implements OnInit, ControlValueAccessor {
 
 
   constructor(private fb: FormBuilder) {
+  }
+
+  ngAfterViewInit(): void {
+    if (this.options.autoScrollHeader) {
+      setTimeout(() => this.scrollActiveTabIntoView(), 0);
+    }
+  }
+
+  public scrollActiveTabIntoView(): boolean {
+    try {
+      const className = `matTabLabel_${this.activeTabIndex}`;
+      let elements = this.matSectionGroup.nativeElement.getElementsByClassName(className);
+      if (elements.length === 0) {
+        elements = document.getElementsByClassName(className);
+      }
+      if (elements.length > 0) {
+        elements[0].scrollIntoView();
+        return true;
+      }
+    } catch (e) {
+    }
+    return false;
   }
 
   /* Update the cron output to that of the selected tab.

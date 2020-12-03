@@ -1,9 +1,12 @@
-<section class="cron-editor-main">
+<section class="cron-editor-main" #matSectionGroup>
     <mat-tab-group class="cron-editor-container" (selectedIndexChange)="onTabFocus($event)"
                    [backgroundColor]="backgroundColor" [color]="color" [selectedIndex]="activeTabIndex">
 
       <!-- Once-->
-      <mat-tab class="cron-editor-tab" label="Once" *ngIf="!options.hideOneTimeTab">
+      <mat-tab class="cron-editor-tab" *ngIf="!options.hideOneTimeTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_0">Once</span>
+        </ng-template>
         <div class="cron-editor-tab-content" [formGroup]="oneTimeForm">
           <mat-form-field class="cron-editor-radio-button">
             <mat-label>Date Time</mat-label>
@@ -13,7 +16,10 @@
       </mat-tab>
 
       <!-- Minute -->
-      <mat-tab class="cron-editor-tab" label="Minutely" *ngIf="!options.hideMinutesTab">
+      <mat-tab class="cron-editor-tab" *ngIf="!options.hideMinutesTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_1">Minutely</span>
+        </ng-template>
         <div class="cron-editor-tab-content">
 
           <span class="cron-form-label">Every </span>
@@ -28,7 +34,10 @@
       </mat-tab>
 
       <!-- Hourly -->
-      <mat-tab class="cron-editor-tab" label="Hourly" *ngIf="!options.hideHourlyTab">
+      <mat-tab class="cron-editor-tab" *ngIf="!options.hideHourlyTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_2">Hourly</span>
+        </ng-template>
         <div class="cron-editor-tab-content">
           <span class="cron-form-label">Every </span>
 
@@ -41,7 +50,10 @@
 
 
       <!-- Daily-->
-      <mat-tab class="cron-editor-tab" label="Daily" *ngIf="!options.hideDailyTab">
+      <mat-tab class="cron-editor-tab" *ngIf="!options.hideDailyTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_3">Daily</span>
+        </ng-template>
         <div class="cron-editor-tab-content" [formGroup]="dailyForm">
 
           <mat-radio-group class="cron-editor-radio-group" formControlName="subTab">
@@ -86,7 +98,10 @@
       </mat-tab>
 
       <!-- Weekly-->
-      <mat-tab  class="cron-editor-tab" label="Weekly" *ngIf="!options.hideWeeklyTab">
+      <mat-tab  class="cron-editor-tab" *ngIf="!options.hideWeeklyTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_4">Weekly</span>
+        </ng-template>
         <div class="cron-editor-tab-content">
 
           <span class="cron-form-label">Every </span>
@@ -113,7 +128,10 @@
     </mat-tab>
 
       <!-- Monthly-->
-      <mat-tab class="cron-editor-tab" label="Monthly" *ngIf="!options.hideMonthlyTab">
+      <mat-tab class="cron-editor-tab" *ngIf="!options.hideMonthlyTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_5">Monthly</span>
+        </ng-template>
 
         <div class="cron-editor-tab-content" [formGroup]="monthlyForm">
 
@@ -226,7 +244,10 @@
       </mat-tab>
 
       <!-- Yearly-->
-      <mat-tab class="cron-editor-tab"  label="Yearly" *ngIf="!options.hideYearlyTab">
+      <mat-tab class="cron-editor-tab" *ngIf="!options.hideYearlyTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_6">Yearly</span>
+        </ng-template>
 
         <div class="cron-editor-tab-content" [formGroup]="yearlyForm">
 
@@ -330,7 +351,10 @@
       </mat-tab>
 
       <!-- Advanced-->
-      <mat-tab class="cron-editor-tab" label="Advanced" *ngIf="!options.hideAdvancedTab">
+      <mat-tab class="cron-editor-tab" *ngIf="!options.hideAdvancedTab">
+        <ng-template mat-tab-label>
+          <span class="matTabLabel_7">Advanced</span>
+        </ng-template>
         <div class="cron-editor-tab-content" [formGroup]="advancedForm">
             <mat-form-field class="cron-editor-radio-button">
               <mat-label>Expression</mat-label>

@@ -33,7 +33,8 @@ export class AppComponent implements OnInit {
     use24HourTime: true,
     hideSeconds: false,
 
-    cronFlavor: 'quartz'
+    cronFlavor: 'quartz',
+    autoScrollHeader: true
   };
 
   @ViewChild('cronEditorDemo', { static: false })

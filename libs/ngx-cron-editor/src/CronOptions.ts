@@ -21,4 +21,5 @@ export interface CronOptions {
     hideSeconds: boolean;
 
     cronFlavor: string;
+    autoScrollHeader?: boolean;
 }
